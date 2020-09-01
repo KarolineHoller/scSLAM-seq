@@ -1,0 +1,19 @@
+#!/usr/bin/Rscript --vanilla
+args = commandArgs(trailingOnly=TRUE)
+
+matrix_dir <- args[1]
+
+
+
+
+
+barcode.path <- paste0(matrix_dir, "barcodes.tsv")
+
+barcode.names = read.delim(barcode.path, 
+                           header = FALSE,
+                           stringsAsFactors = FALSE)
+
+
+write(barcode.names$V1, file = paste0(matrix_dir, "cellranger3_barcodes.txt"))
+
+# Author: Anika Neuschulz
