@@ -5,8 +5,7 @@ import string
 import sys
 import os
 
-# this now works with absolute MT tags, on the other hand unmutated reads and indels are
-# not counted anymore
+# this now works with absolute MT tags
 # Author: Anika Neuschulz
 
 
