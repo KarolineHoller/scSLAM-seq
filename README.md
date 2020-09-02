@@ -11,28 +11,28 @@ Samtools (http://www.htslib.org/) is also required.
 
 2. unzip ```outs/filtered_feature_bc_matrix/barcodes.tsv.gz```
 
-3. run script 1
+3. run ___script 1___
 
 4. zip ```outs/filtered_feature_bc_matrix/barcodes.tsv.gz``` again for later use with Seurat if desired
 
 5. compress, sort and index the .sam file produced by script 1 using samtools
 
-6. run script 2 on the file obtained in step 5
+6. run ___script 2___ on the file obtained in step 5
 
 7. compress, sort and index the .sam file produced by script 2 using samtools
 
-8. if desired, bulk labeling rates can be analyzed at this point using script 4 on the result of step 7. A sequencing quality cutoff for a mutation to be considered valid can be set. For analysis purposes nucleotides at the beginning or the end of reads can also be disregarded in counting ('clipped'). This has no effect on the source file or any step downstream. If any clipping of the reads turns out to be desired, please do so using the software of your choice and start the pipeline again.  
-This step produces 2 output files that can be utilized to plot mutation efficiencies. **"_mutation_occurences_"** has the number of occurences for each possible mutation and **"_nucleotide_counts_"** has the total counts for each nucleotide.  
-Additionally a **"_mutation_locations_"** file is written that has information in which position on the read a mutation occured and if the read was forward (F) or reverse (R). This is a large file, but can be utilized to visualize distribution of mutations along the reads.
+8. if desired, bulk labeling rates can be analyzed at this point using ___script 4___ on the result of step 7. A sequencing quality cutoff for a mutation to be considered valid can be set. For analysis purposes nucleotides at the beginning or the end of reads can also be disregarded in counting ('clipped'). This has no effect on the source file or any step downstream. If any clipping of the reads turns out to be desired, please do so using the software of your choice and start the pipeline again.  
+This step produces 2 output files that can be utilized to plot mutation efficiencies. **"mutation_occurences"** has the number of occurences for each possible mutation and **"nucleotide_counts"** has the total counts for each nucleotide.  
+Additionally a **"mutation_locations"** file is written that has information in which position on the read a mutation occured and if the read was forward (F) or reverse (R). This is a large file, but can be utilized to visualize distribution of mutations along the reads.
 
-9. run script 3 on the file obtained in step 7. Minimum sequencing quality of T to C mutations as well as minimum mutations per UMI can be set. Reads will be separated on a UMI basis.  
+9. run ___script 3___ on the file obtained in step 7. Minimum sequencing quality of T to C mutations as well as minimum mutations per UMI can be set. Reads will be separated on a UMI basis.  
 Three output files will be created:  
-**"_labeled"** has the reads from all UMIs that passed the minimum number of qualifying T to C mutations,  
-**"_maybe-labeled"** has the reads from all UMIs that did not pass the threshold, but still had more that 0 qualifying mutations. This file is empty when separationg with 1 qualifying mutation.  
-Finally **"_unlabeled"** contains the reads from all UMIs that have no qualitying T to C mutations.  
+**"labeled"** has the reads from all UMIs that passed the minimum number of qualifying T to C mutations,  
+**"maybe-labeled"** has the reads from all UMIs that did not pass the threshold, but still had more that 0 qualifying mutations. This file is empty when separationg with 1 qualifying mutation.  
+Finally **"unlabeled"** contains the reads from all UMIs that have no qualitying T to C mutations.  
 This step also creates two metric files:  
-**"_labeled_unlabeled_stats"** contains information on the number of labeled and unlabeled reads for each gene  
-**"_umi_stats"** contains extensive statistics on gene, cell barcode, number of reads, number of T to C mutations and number of unlabeled reads for each UMI. This is a large file, but useful when analyzing labeling information on a per-cell basis.
+**"labeled_unlabeled_stats"** contains information on the number of labeled and unlabeled reads for each gene  
+**"umi_stats"** contains extensive statistics on gene, cell barcode, number of reads, number of T to C mutations and number of unlabeled reads for each UMI. This is a large file, but useful when analyzing labeling information on a per-cell basis.
 
 10. compress, sort and index the .sam files produced by script 3 using samtools
 
