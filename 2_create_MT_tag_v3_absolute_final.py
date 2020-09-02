@@ -3,7 +3,7 @@ import re
 import pdb
 import sys
 import os
-import pandas as pd
+#import pandas as pd
 
 ## input has to be sorted and indexed
 # Author: Anika Neuschulz
