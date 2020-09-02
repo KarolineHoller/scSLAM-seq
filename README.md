@@ -13,7 +13,7 @@ Samtools (http://www.htslib.org/) is also required.
 
 3. run ___script 1___
 
-4. zip ```outs/filtered_feature_bc_matrix/barcodes.tsv.gz``` again for later use with Seurat if desired
+4. zip ```outs/filtered_feature_bc_matrix/barcodes.tsv``` again for later use with Seurat if desired
 
 5. compress, sort and index the .sam file produced by script 1 using samtools
 
