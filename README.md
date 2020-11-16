@@ -68,7 +68,7 @@ run the script ___labeling_eff_per_cell_MTabs_final.py___ on a sorted and indexe
 run the script ___mutation_eff_per_gene_v4_MTabs_final.py___ on a sorted and indexed .bam file that has the MT tag added (output of Step 7 above). A sequencing quality threshold for T to C mutations needs to be provided as a second argument.
 
 
-## Single-cell analysis of labeled und labeled RNA:
+## Single-cell analysis of labeled and unlabeled RNA:
 
 For this analysis, use the count matrices from step 14. Alternatively, download the count matrices from GEO (accession number GSE158849).
 The data is clustered separately with the information of old and new RNA, respectively. The code produces the figures included in the manuscript.
