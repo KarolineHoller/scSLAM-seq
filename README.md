@@ -62,3 +62,8 @@ awk '{printf("%s %s\n%s\n%s\n%s\n", $1, $2, $3, $4, $5)}' select_{_labeled/_unla
 ## to obtain data on labeling rates per cell:
 
 run the script ___labeling_eff_per_cell_MTabs_final.py___ on a sorted and indexed .bam file that has the MT tag added (output of Step 7 above). A sequencing quality threshold for T to C mutations needs to be provided as a second argument.
+
+## Single-cell analysis of labeled und labeled RNA:
+
+For this analysis, use the count matrices from step 14. Alternatively, download the count matrices from GEO (accession number GSE158849).
+The data is clustered separatelywith the information of old and new RNA, respectively. The code produces the figures included in the manuscript.
