@@ -59,6 +59,6 @@ awk '{printf("%s %s\n%s\n%s\n%s\n", $1, $2, $3, $4, $5)}' select_{_labeled/_unla
 
 -----
 
-## to obtain labeling per cell data:
+## to obtain data on labeling rates per cell:
 
 run the script ___labeling_eff_per_cell_MTabs_final.py___ on a sorted and indexed .bam file that has the MT tag added (output of Step 7 above). A sequencing quality threshold for T to C mutations needs to be provided as a second argument.
