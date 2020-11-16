@@ -107,7 +107,23 @@ labeled <- RunUMAP(labeled, reduction = "pca", dims = 1:20)
 labeled <- FindNeighbors(labeled, reduction = "pca", dims = 1:20)
 labeled <- FindClusters(labeled, resolution = 0.5)
 
-#define cluster identities
+labeled.markers <- FindAllMarkers(object = labeled, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+
+## prepare labeling efficiency per cell plot ####
+labeling_eff <- read.table("/your/file/path/mutation_rate_per_cell.tsv",
+                           sep = "\t", header = TRUE)
+labeling_eff$CB <- sapply(labeling_eff$CB, function(x) substr(x, 1, 16))
+rownames(labeling_eff) <- labeling_eff$CB
+labeling_eff$TtoCr <- sapply(labeling_eff$TtoC, function(x) round(x, 3))
+labeled@meta.data <- merge(labeled@meta.data,labeling_eff,by="row.names",all.x=T)
+
+rownames(labeled@meta.data) <- labeled@meta.data$Row.names
+labeled@meta.data$Row.names <- NULL
+
+FeaturePlot(labeled, features = "TtoCr", cols = viridis(4)) #the labeling efficiency goes up to 4 percent, so we chose 4 colors from the viridis palette
+
+
+#define cluster identities as identified by marker gene expression labeled.markers and unlabeled.markers
 labeled_renamed <- labeled
 labeled_renamed <- RenameIdents(object = labeled, `0` = "undetermined", `1` = "ectoderm (neuroectoderm)", `2` = "non-axial mesoderm",
                                 `3` = "ectoderm (neuroectoderm)", `4` = "non-axial mesoderm, ventral mesoderm",
@@ -122,12 +138,12 @@ labeled_identites <- labeled_renamed@meta.data
 labeled_identites[,1:6] <- NULL #remove all clumns from metadata despite the named cluster identity
 
 unlabeled@meta.data <- merge(unlabeled@meta.data, labeled_identites, by="row.names",all.x=T)
-# row.names get mingled by merge, therefore we have to bring them back
+#bring back row.names, as they get mogmled by merge
 rownames(unlabeled@meta.data) <- unlabeled@meta.data$Row.names
 unlabeled@meta.data$Row.names <- NULL
 
 #Check clustering with DimPlots
-karos.col <- brewer.pal(9, "Paired")
+karos.col <- brewer.pal(9, "Paired") #number of colors depends on number of clusters you expect
 DimPlot(unlabeled, group.by = 'named_clusters', cols=karos.col) +
   ggtitle("clustering on unlabeled RNA") + 
   theme(text = element_text(size=12), axis.text = element_text(size=11), legend.position = "none") +
@@ -141,12 +157,15 @@ DimPlot(unlabeled, group.by = 'seurat_clusters', cols=karos.col) +
   ylab("UMAP2")
 
 #
-unlabeled.markers.lc <- FindAllMarkers(object = unlabeled, only.pos = TRUE)
-#the parameter min.pct can be set to zero here because the fraction of PGCs is very low - also known marker genes are expressed
+unlabeled.markers.longlist <- FindAllMarkers(object = unlabeled, only.pos = TRUE)
+#the parameter min.pct can be set to zero here because the fraction of recovered PGCs is very low - also known marker genes are expressed
 #in just a small fraction
 
 #cluster 7 marker genes as a dataframe
 cluster7 <- unlabeled.markers.lc[unlabeled.markers.lc$cluster==7,]
+                            
+#Compare cluster 7 marker genes with vegetally localized genes in the one-cell stage embryo
+#for that, load partial results of a tomo-seq dataset
 veg.tomoseq <- read.csv("/your/file/path/vegetal.genes.dR.csv", header=T)
 
 g=intersect(veg.tomoseq$Gene, cluster7$gene)
