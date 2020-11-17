@@ -52,8 +52,115 @@ library(grid)
 library(gridExtra)
 library(mixtools)
 
-#mitochondrial genes in with annotation of dR11 ####
-#that file sits on the server in my local/genomes
+##sanity checks for our protocol of scSLAM-seq in live embryos, code by @anikaneuschulz####
+#calculate T-to-C mutation per gene
+#the output of the script mutation_eff_per_gene_v4_MTabs_final.py produces the input for the following plot:
+per_gene <- read.csv("/your/file/path/possorted_genome_bam_actual_cells_MD_MTgene_specific_mutation_rates.csv",
+                     header = TRUE, sep = "\t")
+per_gene <- subset(per_gene, readcount > 99)
+per_gene$condition <- "labeled"
+
+per_gene_unlabeled <- read.csv("/your/file/path/Aligned.out_MT.bam.featureCountsgene_specific_mutation_rates.csv",
+                               header = TRUE, sep ="\t")
+per_gene_unlabeled <- subset(per_gene_unlabeled, readcount > 99)
+per_gene_unlabeled$condition <- "unlabeled"
+
+per_gene_both <- rbind(per_gene,per_gene_unlabeled)
+
+#the following code produces the plot in Fig. 3c
+per_gene_plot <- ggplot(data = per_gene_both, mapping = aes(x=per_gene_both$TC*100, fill = condition, alpha = condition)) +
+  geom_histogram(bins = 75, position="identity") +
+  xlab("T to C frequency [%]") +
+  ylab("number of genes") +
+  scale_fill_manual(values = c("#DDAA33", "#004488")) +
+  scale_alpha_manual(values = c(1,0.5)) +
+  theme_linedraw()
+
+#the output of script 4 produces the input for the following code chuck, that we used to produce the plot in Figure 3b (base mutation frequencies):
+mutations <- "/your/file/path/unlabeled_labeled_2mutations_Q20_sorted_mutation_occurences_20_0N.txt"
+nucleotides <- "/your/file/path/unlabeled_labeled_2mutations_Q20_sorted_nucleotide_counts_Q20_C0N.txt"
+
+mutations_unlabeled <- "/your/file/path/Aligned.out_MT_mutation_occurences_20_0N.txt"
+nucleotides_unlabeled <- "/your/file/path/Aligned.out_MT_nucleotide_counts_Q20_C0N.txt"
+
+mutation_occurences <-read.table(file = mutations, sep = '\t', header = FALSE)
+nucleotide_numbers <- read.table(file = nucleotides, sep = "\t", header = FALSE)
+
+mutation_occurences_ul <- read.table(file = mutations_unlabeled, sep = '\t', header = FALSE)
+nucleotide_numbers_ul <- read.table(file = nucleotides_unlabeled, sep = "\t", header = FALSE)#yes, this is idiotic. It didn't give errors though
+
+mutationTableA <- subset(mutation_occurences, V1=="AC")
+mutationTableA <- rbind(mutationTableA, subset(mutation_occurences, V1=="AG"))
+mutationTableA <- rbind(mutationTableA, subset(mutation_occurences, V1=="AT"))
+mutationTableT <- subset(mutation_occurences, V1=="TC")
+mutationTableT <- rbind(mutationTableT, subset(mutation_occurences, V1=="TG"))
+mutationTableT <- rbind(mutationTableT, subset(mutation_occurences, V1=="TA"))
+mutationTableC <- subset(mutation_occurences, V1=="CT")
+mutationTableC <- rbind(mutationTableC, subset(mutation_occurences, V1=="CG"))
+mutationTableC <- rbind(mutationTableC, subset(mutation_occurences, V1=="CA"))
+mutationTableG <- subset(mutation_occurences, V1=="GT")
+mutationTableG <- rbind(mutationTableG, subset(mutation_occurences, V1=="GC"))
+mutationTableG <- rbind(mutationTableG, subset(mutation_occurences, V1=="GA"))
+
+mutationTableA$Freq <- (mutationTableA$V2/subset(nucleotide_numbers, V1 == "A")$V2)*100
+mutationTableT$Freq <- (mutationTableT$V2/subset(nucleotide_numbers, V1 == "T")$V2)*100
+mutationTableC$Freq <- (mutationTableC$V2/subset(nucleotide_numbers, V1 == "C")$V2)*100
+mutationTableG$Freq <- (mutationTableG$V2/subset(nucleotide_numbers, V1 == "G")$V2)*100
+mutationFrequencyTable <- rbind(mutationTableA, mutationTableC, mutationTableG, mutationTableT)
+mutationFrequencyTable$condition <- "Q20 labeled"
+
+# unlabeled data
+mutationTableA_ul <- subset(mutation_occurences_ul, V1=="AC")
+mutationTableA_ul <- rbind(mutationTableA_ul, subset(mutation_occurences_ul, V1=="AG"))
+mutationTableA_ul <- rbind(mutationTableA_ul, subset(mutation_occurences_ul, V1=="AT"))
+mutationTableT_ul <- subset(mutation_occurences_ul, V1=="TC")
+mutationTableT_ul <- rbind(mutationTableT_ul, subset(mutation_occurences_ul, V1=="TG"))
+mutationTableT_ul <- rbind(mutationTableT_ul, subset(mutation_occurences_ul, V1=="TA"))
+mutationTableC_ul <- subset(mutation_occurences_ul, V1=="CT")
+mutationTableC_ul <- rbind(mutationTableC_ul, subset(mutation_occurences_ul, V1=="CG"))
+mutationTableC_ul <- rbind(mutationTableC_ul, subset(mutation_occurences_ul, V1=="CA"))
+mutationTableG_ul <- subset(mutation_occurences_ul, V1=="GT")
+mutationTableG_ul <- rbind(mutationTableG_ul, subset(mutation_occurences_ul, V1=="GC"))
+mutationTableG_ul <- rbind(mutationTableG_ul, subset(mutation_occurences_ul, V1=="GA"))
+
+mutationTableA_ul$Freq <- (mutationTableA_ul$V2/subset(nucleotide_numbers_ul, V1 == "A")$V2)*100
+mutationTableT_ul$Freq <- (mutationTableT_ul$V2/subset(nucleotide_numbers_ul, V1 == "T")$V2)*100
+mutationTableC_ul$Freq <- (mutationTableC_ul$V2/subset(nucleotide_numbers_ul, V1 == "C")$V2)*100
+mutationTableG_ul$Freq <- (mutationTableG_ul$V2/subset(nucleotide_numbers_ul, V1 == "G")$V2)*100
+mutationFrequencyTable_ul <- rbind(mutationTableA_ul, mutationTableC_ul, mutationTableG_ul, mutationTableT_ul)
+mutationFrequencyTable_ul$condition <- "Q20 unlabeled"
+
+mutationFrequencyTable_all <- rbind(mutationFrequencyTable_ul, 
+                                    mutationFrequencyTable)
+
+#here comes Figure 3c:
+ggplot(data = mutationFrequencyTable_all, aes(x=mutationFrequencyTable_all$V1, y=mutationFrequencyTable_all$Freq, color = condition)) +
+  geom_point() +
+  xlab("")+ 
+  ylab("mutation frequency in % of base") +
+  scale_color_manual( values = c("#ddaa33","#004488" )) +
+  theme_linedraw()
+
+#for plot S3c, run the script UMIs_per_cell+genes_per_cell_final.py and use the output for the following ggplot
+umi_gene_stats <- read.csv("/your/file/path/...UMIs+genes_per_cell.csv", header=T, sep = "\t")
+
+ggplot(data = umi_gene_stats, mapping = aes(x = genes)) +
+  geom_histogram(bins = 200) +
+  ylab("number of cells") +
+  theme_linedraw()
+#for plot in S3d, use the output of script 3
+UMI_stats_rep1 <- read.table("/your/file/path/possorted_genome_bam_actual_cells_MD_MT_umi_stats.csv",
+                             header = TRUE,
+                             sep = "\t")
+
+ggplot(data = subset(UMI_stats_rep1, UMI_stats_rep1$nReads < 50), mapping = aes(x = nReads)) +
+  geom_histogram(binwidth = 1) +
+  xlab("Reads per UMI") +
+  ylab("number of occurences") +
+  theme_linedraw()
+
+##Now let's have a look at the single cell data! ####
+#mitochondrial genes with annotation of dR11 ####
 mito.genes <- read.table("/your/file/path/mito.genes.vs.txt",sep = ",")
 mito.genes <- mito.genes$V3
 mito.genes <- as.character(mito.genes)
