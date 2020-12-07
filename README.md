@@ -7,7 +7,7 @@ Pysam (https://github.com/pysam-developers/pysam) is required to run the pipelin
 Samtools (http://www.htslib.org/) is also required.
 
 
-1. map demultiplexed data with cellranger using defauls parameters (tested with release 3.0.2) and add the MD tag using samtools calmd <cellranger output> <reference.fa>
+1. map demultiplexed data with cellranger using defauls parameters (tested with release 3.0.2) and add the MD tag using ```samtools calmd <cellranger output> <reference.fa>```
   The MD tag has information on the reference bases to identify all kinds of base substitutions in the sequenced data.
 
 2. unzip ```outs/filtered_feature_bc_matrix/barcodes.tsv.gz```
