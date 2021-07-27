@@ -103,7 +103,7 @@ for cell in cell_dict:
         cell_dict2[cell][4] = 0
     cell_dict2[cell][5] = cell_dict[cell][5]
 
-pdb.set_trace()
+
 print("writing...")
 with open(ofn, "w") as out:
     header = "CB\tA\tC\tG\tT\tTtoC\treadcount\n"
